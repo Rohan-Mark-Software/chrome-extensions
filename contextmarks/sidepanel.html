@@ -1,290 +1,335 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Context Bookmarks</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Context Bookmarks</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      min-height: 100vh;
-      padding: 40px 20px;
-      color: #333;
-    }
+      body {
+        font-family: "Inter", "SF Pro Display", -apple-system,
+          BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: linear-gradient(135deg, #f5ebe0 0%, #fde8d8 100%);
+        min-height: 100vh;
+        padding: 40px 20px;
+        color: #4a3728;
+      }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-    }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+      }
 
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      color: #fff;
-    }
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #6b4d3a;
+      }
 
-    h1 {
-      font-size: 36px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+      .header img {
+        height: 100px;
+        width: auto;
+        filter: drop-shadow(0 2px 8px rgba(217, 142, 102, 0.3));
+      }
 
-    .subtitle {
-      font-size: 18px;
-      opacity: 0.9;
-    }
+      h1 {
+        font-size: 36px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        background: linear-gradient(135deg, #d98e66 0%, #c77751 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
 
-    .search-bar {
-      background: #fff;
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 30px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
+      .subtitle {
+        font-size: 18px;
+        opacity: 0.85;
+        color: #a67055;
+      }
 
-    .search-input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
-      font-size: 16px;
-      font-family: inherit;
-    }
+      .search-bar {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        padding: 16px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 20px rgba(166, 112, 85, 0.15);
+        border: 1px solid rgba(166, 112, 85, 0.2);
+      }
 
-    .search-input:focus {
-      outline: none;
-      border-color: #667eea;
-    }
+      .search-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid rgba(166, 112, 85, 0.2);
+        border-radius: 12px;
+        font-size: 16px;
+        font-family: inherit;
+        background: rgba(255, 255, 255, 0.6);
+        color: #4a3728;
+        transition: all 0.3s ease;
+      }
 
-    .stats {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 30px;
-    }
+      .search-input::placeholder {
+        color: rgba(74, 55, 40, 0.4);
+      }
 
-    .stat-card {
-      flex: 1;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
+      .search-input:focus {
+        outline: none;
+        border-color: #d98e66;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 0 4px rgba(217, 142, 102, 0.15);
+      }
 
-    .stat-number {
-      font-size: 32px;
-      font-weight: 700;
-      color: #667eea;
-      margin-bottom: 4px;
-    }
+      .stats {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 30px;
+      }
 
-    .stat-label {
-      font-size: 14px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
+      .stat-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(10px);
+        padding: 20px;
+        border-radius: 16px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(166, 112, 85, 0.15);
+        border: 1px solid rgba(166, 112, 85, 0.2);
+        transition: transform 0.3s ease;
+      }
 
-    .bookmarks-list {
-      display: grid;
-      gap: 20px;
-    }
+      .stat-card:hover {
+        transform: translateY(-2px);
+      }
 
-    .bookmark-card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 24px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transition: all 0.3s;
-      cursor: pointer;
-    }
+      .stat-number {
+        font-size: 32px;
+        font-weight: 700;
+        color: #d98e66;
+        margin-bottom: 4px;
+      }
 
-    .bookmark-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-    }
+      .stat-label {
+        font-size: 14px;
+        color: #a67055;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
 
-    .bookmark-header {
-      display: flex;
-      align-items: start;
-      gap: 12px;
-      margin-bottom: 12px;
-    }
+      .bookmarks-list {
+        display: grid;
+        gap: 20px;
+      }
 
-    .favicon {
-      width: 24px;
-      height: 24px;
-      border-radius: 4px;
-      flex-shrink: 0;
-    }
+      .bookmark-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 4px 12px rgba(166, 112, 85, 0.15);
+        border: 1px solid rgba(166, 112, 85, 0.2);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
 
-    .bookmark-title {
-      flex: 1;
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
-    }
+      .bookmark-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(217, 142, 102, 0.25);
+        border-color: rgba(217, 142, 102, 0.4);
+      }
 
-    .bookmark-url {
-      font-size: 13px;
-      color: #667eea;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+      .bookmark-header {
+        display: flex;
+        align-items: start;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
 
-    .bookmark-context {
-      font-size: 15px;
-      color: #555;
-      line-height: 1.6;
-      margin: 16px 0;
-      padding: 12px;
-      background: #f8f9fa;
-      border-radius: 8px;
-      border-left: 3px solid #667eea;
-    }
+      .favicon {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        flex-shrink: 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
 
-    .bookmark-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 16px;
-      padding-top: 16px;
-      border-top: 1px solid #e0e0e0;
-    }
+      .bookmark-title {
+        flex: 1;
+        font-size: 18px;
+        font-weight: 600;
+        color: #4a3728;
+        margin-bottom: 4px;
+      }
 
-    .tags {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+      .bookmark-url {
+        font-size: 13px;
+        color: #c77751;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-family: "Monaco", "Courier New", monospace;
+      }
 
-    .tag {
-      padding: 4px 12px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: #fff;
-      border-radius: 16px;
-      font-size: 12px;
-      font-weight: 500;
-    }
+      .bookmark-context {
+        font-size: 15px;
+        color: #6b4d3a;
+        line-height: 1.6;
+        margin: 16px 0;
+        padding: 12px;
+        background: rgba(217, 142, 102, 0.1);
+        border-radius: 10px;
+        border-left: 3px solid #d98e66;
+      }
 
-    .timestamp {
-      font-size: 13px;
-      color: #999;
-    }
+      .bookmark-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 16px;
+        padding-top: 16px;
+        border-top: 1px solid rgba(166, 112, 85, 0.2);
+      }
 
-    .actions {
-      display: flex;
-      gap: 8px;
-    }
+      .tags {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
 
-    .btn-icon {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: all 0.2s;
-      background: #f0f0f0;
-    }
+      .tag {
+        padding: 4px 12px;
+        background: linear-gradient(135deg, #d98e66 0%, #c77751 100%);
+        color: #fff;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        box-shadow: 0 2px 6px rgba(217, 142, 102, 0.25);
+      }
 
-    .btn-icon:hover {
-      background: #e0e0e0;
-    }
+      .timestamp {
+        font-size: 13px;
+        color: #a67055;
+      }
 
-    .btn-delete {
-      color: #e74c3c;
-    }
+      .actions {
+        display: flex;
+        gap: 8px;
+      }
 
-    .btn-delete:hover {
-      background: #ffe5e5;
-    }
+      .btn-icon {
+        padding: 8px 12px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.2s;
+        background: rgba(166, 112, 85, 0.15);
+        color: #6b4d3a;
+      }
 
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: #fff;
-    }
+      .btn-icon:hover {
+        background: rgba(166, 112, 85, 0.25);
+      }
 
-    .empty-icon {
-      font-size: 64px;
-      margin-bottom: 16px;
-    }
+      .btn-delete {
+        color: #d9534f;
+      }
 
-    .empty-text {
-      font-size: 20px;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
+      .btn-delete:hover {
+        background: rgba(217, 83, 79, 0.15);
+      }
 
-    .empty-subtext {
-      font-size: 16px;
-      opacity: 0.8;
-    }
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b4d3a;
+      }
 
-    .export-btn {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      padding: 14px 24px;
-      background: #fff;
-      color: #667eea;
-      border: none;
-      border-radius: 25px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      transition: all 0.3s;
-    }
+      .empty-icon {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.6;
+      }
 
-    .export-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>💡 My Context Bookmarks</h1>
-      <div class="subtitle">All your saved insights in one place</div>
-    </div>
+      .empty-text {
+        font-size: 20px;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #a67055;
+      }
 
-    <div class="search-bar">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search bookmarks by title, context, tags, or URL...">
-    </div>
+      .empty-subtext {
+        font-size: 16px;
+        opacity: 0.7;
+      }
 
-    <div class="stats">
-      <div class="stat-card">
-        <div class="stat-number" id="totalCount">0</div>
-        <div class="stat-label">Total Bookmarks</div>
+      .export-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, #d98e66 0%, #c77751 100%);
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 20px rgba(217, 142, 102, 0.3);
+        transition: all 0.3s ease;
+      }
+
+      .export-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 24px rgba(217, 142, 102, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="icon_long.png" />
       </div>
-      <div class="stat-card">
-        <div class="stat-number" id="tagCount">0</div>
-        <div class="stat-label">Unique Tags</div>
+
+      <div class="search-bar">
+        <input
+          type="text"
+          id="searchInput"
+          class="search-input"
+          placeholder="Search bookmarks by title, context, tags, or URL..."
+        />
+      </div>
+
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-number" id="totalCount">0</div>
+          <div class="stat-label">Total Bookmarks</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="tagCount">0</div>
+          <div class="stat-label">Unique Tags</div>
+        </div>
+      </div>
+
+      <div id="bookmarksList" class="bookmarks-list"></div>
+
+      <div id="emptyState" class="empty-state" style="display: none">
+        <div class="empty-icon">📚</div>
+        <div class="empty-text">No bookmarks yet</div>
+        <div class="empty-subtext">
+          Start saving pages with context using the extension popup
+        </div>
       </div>
     </div>
 
-    <div id="bookmarksList" class="bookmarks-list"></div>
+    <button class="export-btn" id="exportBtn">📥 Export Data</button>
 
-    <div id="emptyState" class="empty-state" style="display: none;">
-      <div class="empty-icon">📚</div>
-      <div class="empty-text">No bookmarks yet</div>
-      <div class="empty-subtext">Start saving pages with context using the extension popup</div>
-    </div>
-  </div>
-
-  <button class="export-btn" id="exportBtn">📥 Export Data</button>
-
-  <script src="sidepanel.js"></script>
-</body>
+    <script src="sidepanel.js"></script>
+  </body>
 </html>
