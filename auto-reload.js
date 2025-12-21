@@ -91,7 +91,7 @@ class ExtensionAutoReloader {
   }
 }
 
-const extensionPath = "./contextmarks"; // Change to your extension path
+const extensionPath = "./polymarket"; // Change to your extension path
 
 const reloader = new ExtensionAutoReloader(extensionPath);
 reloader.start().catch(console.error);
