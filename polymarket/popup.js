@@ -2,6 +2,7 @@
 const POLYMARKET_API = "https://gamma-api.polymarket.com";
 
 // Extract slug from URL
+// Slug is the part after /event/
 function extractSlugFromUrl(url) {
   try {
     const urlObj = new URL(url);
@@ -50,10 +51,12 @@ function formatEventData(eventData) {
     formatted += `💰 OUTCOMES & ODDS:\n`;
 
     // Handle different possible data structures
-    const outcomes = Array.isArray(market.outcomes) ? market.outcomes : [];
+    const outcomes = Array.isArray(market.outcomes)
+      ? market.outcomes
+      : JSON.parse(market.outcomes.replace(/'/g, '"'));
     const prices = Array.isArray(market.outcomePrices)
       ? market.outcomePrices
-      : [];
+      : JSON.parse(market.outcomePrices.replace(/'/g, '"'));
 
     if (outcomes.length === 0) {
       formatted += `  ⚠️  No outcomes available\n`;
@@ -100,36 +103,27 @@ function formatEventData(eventData) {
 async function analyzeBetWithLLM(eventData) {
   const formattedData = formatEventData(eventData);
 
-  const prompt = `You are a professional Polymarket betting analyst with access to real-time market data.
+  const prompt = `You are a professional Polymarket analyst. Analyze this market data and recommend the best betting opportunities.
 
 ${formattedData}
 
-Provide a concise, actionable betting analysis:
+Provide your analysis in this exact format:
 
-**🎲 RECOMMENDED BET** (Your top pick)
-- Outcome: [Specific option with current odds]
-- Expected Value: [Why this is +EV]
-- Key Reasoning: [2-3 critical factors]
+**TOP BET**
+Outcome: [Specific option with odds]
+Reasoning: [Why this offers value in 2-3 sentences]
 
-**📊 MARKET EFFICIENCY**
-- Are current odds accurate?
-- Any mispriced outcomes?
+**MARKET ASSESSMENT**
+[Are the odds accurate? Any mispriced outcomes? 2-3 sentences]
 
-**⚡ ALTERNATIVE OPTIONS**
-- Second best choice
-- Long-shot opportunity (if viable)
+**KEY RISKS**
+[Main factors that could change the outcome. 2-3 bullet points]
 
-**⚠️ KEY RISKS**
-- Main factors that could change outcome
-- Information gaps
+**CONFIDENCE LEVEL: [X]%**
 
-**💰 POSITION SIZING**
-- Recommended: Conservative/Moderate/Aggressive
-- Why: [Brief explanation]
+**RISK LEVEL: [Low/Medium/High]**
 
-**🎯 CONFIDENCE: [X/10]**
-
-Be direct, analytical, and focus on VALUE.`;
+Be direct and focus on actionable value.`;
 
   try {
     // Send message to background script to call Ollama
@@ -177,14 +171,10 @@ function displayOdds(eventData) {
     // Typecast to arrays to handle any data type
     const outcomes = Array.isArray(market.outcomes)
       ? market.outcomes
-      : market.outcomes
-      ? [market.outcomes]
-      : [];
+      : JSON.parse(market.outcomes.replace(/'/g, '"'));
     const prices = Array.isArray(market.outcomePrices)
       ? market.outcomePrices
-      : market.outcomePrices
-      ? [market.outcomePrices]
-      : [];
+      : JSON.parse(market.outcomePrices.replace(/'/g, '"'));
 
     if (outcomes.length === 0) {
       oddsHtml +=
@@ -223,6 +213,8 @@ const loading = document.getElementById("loading");
 const results = document.getElementById("results");
 const resultsContent = document.getElementById("resultsContent");
 const errorDiv = document.getElementById("error");
+const confidenceElement = document.getElementById("confidence");
+const riskLevelElement = document.getElementById("riskLevel");
 
 let currentSlug = null;
 
@@ -294,16 +286,41 @@ async function analyzeCurrentBet() {
     statusContent.textContent = "🤖 Analyzing with AI...";
     const analysis = await analyzeBetWithLLM(eventData);
 
-    // Step 3: Display results
+    // Parse values from analysis
+    const confidenceMatch = analysis.match(
+      /\*\*CONFIDENCE LEVEL:\*?\*?\s*(\d+)%/
+    );
+    console.log(confidenceMatch);
+    const confidenceValue = confidenceMatch ? parseInt(confidenceMatch[1]) : 0;
+
+    const riskMatch = analysis.match(
+      /\*\*RISK LEVEL:\*?\*?\s*(Low|Medium|High)\*?\*?/
+    );
+    const riskLevelValue = riskMatch ? riskMatch[1] : "Unknown";
+
+    // Update DOM
+    confidenceElement.textContent = `${confidenceValue}%`;
+    riskLevelElement.textContent = riskLevelValue;
+
+    console.log(confidenceValue, riskLevelValue);
+
     loading.style.display = "none";
     results.classList.add("show");
 
     const oddsHtml = displayOdds(eventData);
+    function formatAnalysis(text) {
+      return text
+        .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+        .replace(/\n/g, "<br>")
+        .replace(/- (.+)/g, "<li>$1</li>")
+        .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
+    }
+
     resultsContent.innerHTML = `
-      <h4 style="color: #667eea; margin-bottom: 10px;">Current Odds</h4>
-      ${oddsHtml}
-      <h4 style="color: #667eea; margin: 20px 0 10px 0;">AI Analysis</h4>
-      <div style="white-space: pre-wrap; line-height: 1.8;">${analysis}</div>
+    <h4 style="color: #667eea; margin-bottom: 10px;">Current Odds</h4>
+    ${oddsHtml}
+    <h4 style="color: #667eea; margin: 20px 0 10px 0;">AI Analysis</h4>
+    <div style="line-height: 1.8;">${formatAnalysis(analysis)}</div>
     `;
 
     statusContent.textContent = `✅ Analysis complete`;

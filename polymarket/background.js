@@ -1,10 +1,6 @@
-// Background service worker to handle API calls
-// This bypasses CORS restrictions
-
 const OLLAMA_API = "http://127.0.0.1:11434";
 const MODEL = "gpt-oss:120b-cloud";
 
-// Listen for messages from popup
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "analyzeWithLLM") {
     // Handle async operation
@@ -12,7 +8,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .then((response) => sendResponse({ success: true, data: response }))
       .catch((error) => sendResponse({ success: false, error: error.message }));
 
-    // Return true to indicate we'll respond asynchronously
     return true;
   }
 });
