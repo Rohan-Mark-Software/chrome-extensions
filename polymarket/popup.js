@@ -1,8 +1,5 @@
-// Polymarket API and analysis functions
 const POLYMARKET_API = "https://gamma-api.polymarket.com";
 
-// Extract slug from URL
-// Slug is the part after /event/
 function extractSlugFromUrl(url) {
   try {
     const urlObj = new URL(url);
@@ -32,6 +29,34 @@ async function getPolymarketEventData(slug) {
   }
 }
 
+// Search DuckDuckGo for context about the market
+async function searchDuckDuckGo(query) {
+  try {
+    const response = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage(
+        { action: "searchDuckDuckGo", query: query },
+        (response) => {
+          console.log("Response received:", response);
+          console.log("Last error:", chrome.runtime.lastError);
+          if (chrome.runtime.lastError) {
+            console.log("This error");
+            reject(new Error(chrome.runtime.lastError.message));
+          } else if (!response.success) {
+            console.log("That error");
+            reject(new Error(response.error));
+          } else {
+            resolve(response.data);
+          }
+        }
+      );
+    });
+    return response;
+  } catch (error) {
+    console.error("Error searching DuckDuckGo:", error);
+    return "No additional context available.";
+  }
+}
+
 // Format event data for display and context
 function formatEventData(eventData) {
   let formatted = `📊 POLYMARKET EVENT DATA\n${"=".repeat(60)}\n\n`;
@@ -46,6 +71,9 @@ function formatEventData(eventData) {
   }
 
   markets.forEach((market, i) => {
+    if (!market.outcomes || !market.outcomePrices) {
+      return; // Move to next iteration
+    }
     formatted += `\n${"─".repeat(60)}\n`;
     formatted += `Market ${i + 1}: ${market.question || "N/A"}\n\n`;
     formatted += `💰 OUTCOMES & ODDS:\n`;
@@ -103,9 +131,20 @@ function formatEventData(eventData) {
 async function analyzeBetWithLLM(eventData) {
   const formattedData = formatEventData(eventData);
 
+  const searchQuery =
+    eventData.title || eventData.markets?.[0]?.question || "market analysis";
+
+  console.log(searchQuery);
+
+  const webContext = await searchDuckDuckGo(searchQuery);
+
+  console.log(webContext);
+
   const prompt = `You are a professional Polymarket analyst. Analyze this market data and recommend the best betting opportunities.
 
 ${formattedData}
+
+Web Context for the given Market Bet: ${webContext}
 
 Provide your analysis in this exact format:
 
@@ -160,6 +199,9 @@ function displayOdds(eventData) {
   let oddsHtml = '<div class="odds-display">';
 
   markets.forEach((market, i) => {
+    if (!market.outcomes || !market.outcomePrices) {
+      return; // Move to next iteration
+    }
     if (i > 0)
       oddsHtml +=
         '<hr style="margin: 15px 0; border: none; border-top: 2px solid #dee2e6;">';
@@ -256,7 +298,7 @@ function showError(message) {
   }, 5000);
 }
 
-// Main analysis function
+// Analyze current bet
 async function analyzeCurrentBet() {
   if (!currentSlug) {
     showError("No valid bet found on current page");
@@ -286,6 +328,8 @@ async function analyzeCurrentBet() {
     statusContent.textContent = "🤖 Analyzing with AI...";
     const analysis = await analyzeBetWithLLM(eventData);
 
+    console.log("LLM Analysis:", analysis);
+
     // Parse values from analysis
     const confidenceMatch = analysis.match(
       /\*\*CONFIDENCE LEVEL:\*?\*?\s*(\d+)%/
@@ -299,8 +343,8 @@ async function analyzeCurrentBet() {
     const riskLevelValue = riskMatch ? riskMatch[1] : "Unknown";
 
     // Update DOM
-    confidenceElement.textContent = `${confidenceValue}%`;
-    riskLevelElement.textContent = riskLevelValue;
+    //confidenceElement.textContent = `${confidenceValue}%`;
+    // riskLevelElement.textContent = riskLevelValue;
 
     console.log(confidenceValue, riskLevelValue);
 
@@ -316,9 +360,11 @@ async function analyzeCurrentBet() {
         .replace(/(<li>.*<\/li>)/s, "<ul>$1</ul>");
     }
 
+    // Display this if needed omsode resultsContent. Takes up too much space
+    // <h4 style="color: #667eea; margin-bottom: 10px;">Current Odds</h4>
+    // ${oddsHtml}
+
     resultsContent.innerHTML = `
-    <h4 style="color: #667eea; margin-bottom: 10px;">Current Odds</h4>
-    ${oddsHtml}
     <h4 style="color: #667eea; margin: 20px 0 10px 0;">AI Analysis</h4>
     <div style="line-height: 1.8;">${formatAnalysis(analysis)}</div>
     `;
