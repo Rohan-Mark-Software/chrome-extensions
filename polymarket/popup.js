@@ -127,18 +127,15 @@ function formatEventData(eventData) {
   return formatted;
 }
 
-// Call Ollama LLM for analysis (via background script to avoid CORS)
 async function analyzeBetWithLLM(eventData) {
   const formattedData = formatEventData(eventData);
 
   const searchQuery =
     eventData.title || eventData.markets?.[0]?.question || "market analysis";
 
-  console.log(searchQuery);
-
   const webContext = await searchDuckDuckGo(searchQuery);
 
-  console.log(webContext);
+  console.log(`This is the web context : ${webContext}`);
 
   const prompt = `You are a professional Polymarket analyst. Analyze this market data and recommend the best betting opportunities.
 

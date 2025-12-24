@@ -12,7 +12,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     fetch(`${FLASK_API}/search?q=${encodeURIComponent(request.query)}`)
       .then((response) => response.json())
       .then((data) => {
-        sendResponse({ success: data.success, data: data.data });
+        console.log(`The data recived from flask : ${data}`);
+        sendResponse({ success: data.success, data: data.context });
       })
       .catch((error) => {
         sendResponse({ success: false, error: error.message });

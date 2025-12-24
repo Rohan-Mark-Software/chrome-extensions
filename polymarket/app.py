@@ -121,16 +121,13 @@ def search():
     
     if not query:
         return jsonify({'success': False, 'error': 'Query parameter "q" is required'}), 400
-    
-    # Get optional parameters
+
     engines = request.args.get('engines', 'duckduckgo,bing').split(',')
     max_results = min(int(request.args.get('max_results', 10)), 50)
-    format_type = request.args.get('format', 'structured')  # 'structured' or 'text'
     
     try:
         all_results = []
         
-        # Search each requested engine
         if 'duckduckgo' in engines:
             all_results.extend(search_duckduckgo(query, num_results=max_results))
         
@@ -141,33 +138,26 @@ def search():
             return jsonify({
                 'success': True,
                 'query': query,
-                'results': [],
+                'data': [],  
+                'context': "", 
                 'message': 'No results found'
             })
         
-        # Rank and merge results
         ranked_results = merge_and_rank_results(all_results, query, max_results)
-        
-        # Format response based on request
-        if format_type == 'text':
-            context = '\n\n'.join([
-                f"{r['title']}\n{r['snippet']}"
-                for r in ranked_results
-            ])
-            return jsonify({
-                'success': True,
-                'query': query,
-                'data': context,
-                'count': len(ranked_results)
-            })
-        else:
-            return jsonify({
-                'success': True,
-                'query': query,
-                'results': ranked_results,
-                'count': len(ranked_results)
-            })
-    
+
+        context = '\n\n'.join([
+            f"{r['title']}\n{r['snippet']}"
+            for r in ranked_results
+        ])
+
+        return jsonify({
+            'success': True,
+            'query': query,
+            'data': ranked_results,  
+            'context': context,       
+            'count': len(ranked_results)
+        }), 200
+
     except Exception as e:
         return jsonify({
             'success': False,
