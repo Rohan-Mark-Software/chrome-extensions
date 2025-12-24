@@ -44,17 +44,3 @@ This runs the Puppeteer application to automatically reload the extension, elimi
    ```bash
    python3 app.py
    ```
-
-## Troubleshooting
-
-If you encounter dependency issues, install them one by one as they appear in error messages.
-
-## Additional Information
-
-_Add sections here for:_
-
-- Project description
-- Features
-- Usage examples
-- Contributing guidelines
-- License
