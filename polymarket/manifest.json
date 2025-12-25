@@ -9,6 +9,7 @@
     "https://gamma-api.polymarket.com/*",
     "http://localhost:11434/*",
     "http://127.0.0.1:11434/*",
+    "http://127.0.0.1:5000/*",
     "https://api.duckduckgo.com/*"
   ],
   "background": {

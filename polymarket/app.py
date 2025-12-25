@@ -10,7 +10,6 @@ import hashlib
 app = Flask(__name__)
 CORS(app)
 
-# Cache results for 5 minutes to reduce redundant requests
 @lru_cache(maxsize=100)
 def cached_search(query_hash, engine, timestamp):
     """Cache wrapper - timestamp ensures cache expires every 5 minutes"""
@@ -189,4 +188,4 @@ def internal_error(e):
     return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

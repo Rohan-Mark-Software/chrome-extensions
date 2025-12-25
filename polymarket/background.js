@@ -1,6 +1,6 @@
-const OLLAMA_API = "http://127.0.0.1:11434";
-const MODEL = "deepseek-v3.1:671b-cloud";
-const FLASK_API = "http://127.0.0.1:5000";
+const OLLAMA_API = "http://<publicipv4_ec2_instance>:11434";
+const MODEL = "gpt-oss:120b-cloud";
+const FLASK_API = "http://<publicipv4_ec2_instance>:5000";
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "analyzeWithLLM") {
@@ -12,7 +12,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     fetch(`${FLASK_API}/search?q=${encodeURIComponent(request.query)}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(`The data recived from flask : ${data}`);
         sendResponse({ success: data.success, data: data.context });
       })
       .catch((error) => {
