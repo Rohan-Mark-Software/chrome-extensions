@@ -1,6 +1,6 @@
-const OLLAMA_API = "http://<publicipv4_ec2_instance>:11434";
+const OLLAMA_API = "http://18.223.136.141:11434";
 const MODEL = "gpt-oss:120b-cloud";
-const FLASK_API = "http://<publicipv4_ec2_instance>:5000";
+const FLASK_API = "http://18.223.136.141:5000";
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "analyzeWithLLM") {

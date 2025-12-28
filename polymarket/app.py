@@ -6,6 +6,7 @@ from urllib.parse import quote_plus
 import time
 from functools import lru_cache
 import hashlib
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 app = Flask(__name__)
 CORS(app)
@@ -127,11 +128,24 @@ def search():
     try:
         all_results = []
         
-        if 'duckduckgo' in engines:
-            all_results.extend(search_duckduckgo(query, num_results=max_results))
-        
-        if 'bing' in engines:
-            all_results.extend(search_bing(query, num_results=max_results))
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            future_to_engine = {}
+            
+            if 'duckduckgo' in engines:
+                future = executor.submit(search_duckduckgo, query, max_results)
+                future_to_engine[future] = 'duckduckgo'
+            
+            if 'bing' in engines:
+                future = executor.submit(search_bing, query, max_results)
+                future_to_engine[future] = 'bing'
+            
+            for future in as_completed(future_to_engine):
+                engine_name = future_to_engine[future]
+                try:
+                    results = future.result()
+                    all_results.extend(results)
+                except Exception as e:
+                    print(f"{engine_name} search failed: {str(e)}")
         
         if not all_results:
             return jsonify({
