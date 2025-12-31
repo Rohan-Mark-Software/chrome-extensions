@@ -1,6 +1,3 @@
-"""
-Cache service for managing search result caching
-"""
 import hashlib
 from typing import Optional
 from flask_caching import Cache
