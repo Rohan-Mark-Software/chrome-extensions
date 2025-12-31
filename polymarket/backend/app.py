@@ -83,7 +83,6 @@ def create_app(config_name: str = None):
         max_results = min(int(request.args.get('max_results', app.config['DEFAULT_MAX_RESULTS'])), 
                          app.config['MAX_RESULTS_LIMIT'])
         
-        # Try cache first
         cache_key = cache_service.get_cache_key(query, engines, max_results)
         cached_response = cache_service.get(cache_key)
         
@@ -153,4 +152,4 @@ def create_app(config_name: str = None):
 
 if __name__ == '__main__':
     app = create_app('development')
-    app.run(host="0.0.0.0", port=5001, debug=False)
+    app.run(host="0.0.0.0", port=5000, debug=False)
