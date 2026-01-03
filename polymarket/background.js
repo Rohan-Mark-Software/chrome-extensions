@@ -1,6 +1,6 @@
 const OLLAMA_API = "http://localhost:11434";
 const MODEL = "gpt-oss:120b-cloud";
-const FLASK_API = "http://localhost:5000";
+const FLASK_API = "http://localhost:5001";
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "analyzeWithLLM") {
